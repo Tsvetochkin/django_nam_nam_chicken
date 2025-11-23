@@ -1,0 +1,46 @@
+<h1>Confirmación de Pedido - Nam Nam Chicken</h1>
+
+<p>Estimado/a {{ order.first_name }},</p>
+
+<p>¡Gracias por su pedido en Nam Nam Chicken!</p>
+
+<p>Su número de pedido es <strong>{{ order.id }}</strong>.</p>
+
+<p>Aquí están los detalles de su pedido:</p>
+
+<table style="width: 100%; border-collapse: collapse;">
+    <thead>
+        <tr>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Producto</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Cantidad</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Precio</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order.items.all %}
+        <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">{{ item.product.name }}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">{{ item.quantity }}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${{ item.price }}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${{ item.get_cost }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="3" style="border: 1px solid #ddd; padding: 8px; text-align: right; font-weight: bold;">Total:</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right; font-weight: bold;">${{ order.get_total_cost }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>Su pedido será entregado a:</p>
+<p>
+    {{ order.first_name }} {{ order.last_name }}<br>
+    {{ order.address }}<br>
+    {{ order.celular }}
+</p>
+
+<p>Si tiene alguna pregunta, por favor contáctenos.</p>
+
+<p>Gracias,<br>
+El Equipo de Nam Nam Chicken</p>

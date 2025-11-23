@@ -1,0 +1,36 @@
+{% extends "shop/base.html" %}
+
+{% block title %}
+  Historial de Compras
+{% endblock %}
+
+{% block content %}
+  <h1>Historial de Compras</h1>
+
+  {% if orders %}
+    {% for order in orders %}
+      <div class="card mb-4">
+        <div class="card-header">
+          Pedido #{{ order.id }} - {{ order.created|date:"d M Y H:i" }}
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Total: ${{ order.get_total_cost|floatformat:2 }}</h5>
+          <p class="card-text">Estado: {% if order.paid %}Pagado{% else %}No pagado{% endif %}</p>
+          {% if order.notes %}
+            <p class="card-text">Notas: {{ order.notes }}</p>
+          {% endif %}
+          <h6>Artículos:</h6>
+          <ul class="list-group list-group-flush">
+            {% for item in order.items.all %}
+              <li class="list-group-item">
+                {{ item.product.name }} x {{ item.quantity }} - ${{ item.get_cost|floatformat:2 }}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>Aún no tienes pedidos.</p>
+  {% endif %}
+{% endblock %}

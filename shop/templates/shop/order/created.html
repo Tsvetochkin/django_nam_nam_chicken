@@ -1,0 +1,17 @@
+{% extends "shop/base.html" %}
+
+{% block title %}
+  Pedido Realizado
+{% endblock %}
+
+{% block content %}
+  <h1>Su pedido ha sido realizado con éxito</h1>
+  <p>Su número de pedido es <strong>{{ order.id }}</strong>.</p>
+  {% if order.notes %}
+    <p>Notas para el pedido: <strong>{{ order.notes }}</strong></p>
+  {% endif %}
+  <p>Recibirá una confirmación por correo electrónico con los detalles de su pedido en breve.</p>
+  <p>
+    <a href="{% url "shop:product_list" %}" class="btn btn-primary">Continuar comprando</a>
+  </p>
+{% endblock %}

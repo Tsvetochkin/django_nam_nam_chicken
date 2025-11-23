@@ -1,0 +1,25 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Crear una Cuenta{% endblock %}
+
+{% block content %}
+  <h1>Crear una Cuenta</h1>
+  {% if form.errors %}
+    <div class="alert alert-danger">
+      Por favor, corrija los errores a continuación.
+    </div>
+  {% endif %}
+  <p>Por favor, regístrese usando el siguiente formulario:</p>
+  <form method="post">
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+    {% endif %}
+    {{ form.as_p }}
+    {% csrf_token %}
+    <p><button type="submit" class="btn btn-primary">Crear mi cuenta</button></p>
+  </form>
+{% endblock %}

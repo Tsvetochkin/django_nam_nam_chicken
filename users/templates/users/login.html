@@ -1,0 +1,22 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Iniciar Sesión{% endblock %}
+
+{% block content %}
+  <h1>Iniciar Sesión</h1>
+  {% if form.errors %}
+    <div class="alert alert-danger">
+      Su nombre de usuario y contraseña no coinciden. Por favor, inténtelo de nuevo.
+    </div>
+  {% else %}
+    <p>Por favor, use el siguiente formulario para iniciar sesión:</p>
+  {% endif %}
+  <div class="login-form">
+    <form action="{% url 'users:login' %}" method="post">
+      {{ form.as_p }}
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}" />
+      <p><button type="submit" class="btn btn-primary">Iniciar Sesión</button></p>
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,133 @@
+/* Custom styles for Nam Nam Chicken */
+
+:root {
+    --bs-primary: #FFC107; /* Amber/Orange for primary actions */
+    --bs-secondary: #6F4E37; /* Coffee/Brown for secondary elements */
+    --bs-success: #28a745; /* Keep default green for success */
+    --bs-info: #17a2b8; /* Keep default info blue */
+    --bs-warning: #ffc107; /* Use primary color for warning */
+    --bs-danger: #dc3545; /* Keep default danger red */
+    --bs-light: #f8f9fa; /* Keep default light */
+    --bs-dark: #343a40; /* Keep default dark */
+
+    /* Custom background color */
+    --bs-body-bg: #FFF8E1; /* Light Cream background */
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bs-body-bg);
+    background-image: url('/static/img/background.png'); /* Path to the background image */
+    background-size: cover; /* Cover the entire viewport */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-attachment: fixed; /* Keep the background fixed when scrolling */
+    background-position: center center; /* Center the background image */
+}
+
+main {
+    flex: 1; /* Allow main content to grow and push footer down */
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: var(--bs-primary) !important; /* Make brand name stand out */
+}
+
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: var(--bs-dark); /* Ensure text is readable on primary button */
+}
+
+.btn-primary:hover {
+    background-color: #E0A800; /* Darker shade of primary */
+    border-color: #E0A800;
+    color: white; /* Ensure text remains readable */
+}
+
+div.card {
+    border-color: var(--bs-primary);
+    background-color: transparent; /* Explicitly make cards transparent */
+}
+
+.card-title {
+    color: var(--bs-dark);
+}
+
+/* Adjust dropdown menu for categories */
+.dropdown-menu {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-primary);
+}
+
+.dropdown-item {
+    color: var(--bs-dark);
+}
+
+.dropdown-item:hover {
+    background-color: var(--bs-primary);
+    color: var(--bs-dark);
+}
+
+/* Adjust cart summary in navbar */
+.navbar .btn-outline-primary {
+    color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.navbar .btn-outline-primary:hover {
+    background-color: var(--bs-primary);
+    color: var(--bs-dark);
+}
+
+.navbar .badge {
+    background-color: var(--bs-secondary) !important;
+    color: white;
+}
+
+/* Adjust user dropdown */
+.navbar .dropdown-toggle.text-dark {
+    color: var(--bs-dark) !important;
+}
+
+.navbar .dropdown-toggle.text-dark:hover {
+    color: var(--bs-primary) !important;
+}
+
+/* Adjust form buttons */
+.btn-success {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: var(--bs-dark);
+}
+
+.btn-success:hover {
+    background-color: #E0A800; /* Darker shade of primary */
+    border-color: #E0A800;
+    color: var(--bs-dark); /* Ensure text is readable */
+}
+
+.btn-warning {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #5A3E2B; /* Darker shade of secondary */
+    border-color: #5A3E2B;
+    color: white; /* Ensure text is readable */
+}
+
+.footer {
+    /* margin-top: 4mm; */ /* Removed */
+}
+
+body > .footer {
+    margin-top: 20px; /* Push footer down */
+}
