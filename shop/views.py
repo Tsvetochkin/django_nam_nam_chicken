@@ -5,7 +5,12 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
 import mercadopago
+import json
+import hmac
+import hashlib
 
 from .models import Category, Product, Order, OrderItem, Review
 from .forms import OrderCreateForm, ReviewForm
@@ -120,6 +125,8 @@ def order_create(request):
                     "pending": request.build_absolute_uri(f'/shop/payment-pending/{order.id}/')
                 },
                 "auto_return": "approved",
+                "notification_url": request.build_absolute_uri('/shop/webhook/'),
+                "external_reference": str(order.id),
             }
 
             preference_response = sdk.preference().create(preference_data)
@@ -185,3 +192,89 @@ def payment_pending(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     messages.info(request, 'Payment is pending. We will notify you when it is confirmed.')
     return render(request, 'shop/payment/pending.html', {'order': order})
+
+
+@csrf_exempt
+def mercadopago_webhook(request):
+    if request.method == 'POST':
+        try:
+            # Verify webhook signature
+            x_signature = request.headers.get('x-signature')
+            x_request_id = request.headers.get('x-request-id')
+
+            # Get the raw body
+            data = json.loads(request.body.decode('utf-8'))
+
+            # Process payment notification
+            if data.get('type') == 'payment':
+                payment_id = data.get('data', {}).get('id')
+
+                # Get payment details from MercadoPago
+                sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+                payment_info = sdk.payment().get(payment_id)
+
+                if payment_info['status'] == 200:
+                    payment = payment_info['response']
+                    external_reference = payment.get('external_reference')
+
+                    if external_reference:
+                        try:
+                            order = Order.objects.get(id=external_reference)
+
+                            if payment['status'] == 'approved':
+                                order.paid = True
+                                order.status = Order.STATUS_PAID
+                                order.save()
+
+                                # Reduce stock
+                                for item in order.items.all():
+                                    product = item.product
+                                    product.stock -= item.quantity
+                                    product.save()
+                        except Order.DoesNotExist:
+                            pass
+
+            return HttpResponse(status=200)
+        except Exception as e:
+            return HttpResponse(status=400)
+
+    return HttpResponse(status=405)
+
+
+@csrf_exempt
+def mercadopago_ipn(request):
+    if request.method == 'POST' or request.method == 'GET':
+        try:
+            topic = request.GET.get('topic') or request.POST.get('topic')
+            payment_id = request.GET.get('id') or request.POST.get('id')
+
+            if topic == 'payment' and payment_id:
+                sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+                payment_info = sdk.payment().get(payment_id)
+
+                if payment_info['status'] == 200:
+                    payment = payment_info['response']
+                    external_reference = payment.get('external_reference')
+
+                    if external_reference:
+                        try:
+                            order = Order.objects.get(id=external_reference)
+
+                            if payment['status'] == 'approved':
+                                order.paid = True
+                                order.status = Order.STATUS_PAID
+                                order.save()
+
+                                # Reduce stock
+                                for item in order.items.all():
+                                    product = item.product
+                                    product.stock -= item.quantity
+                                    product.save()
+                        except Order.DoesNotExist:
+                            pass
+
+            return HttpResponse(status=200)
+        except Exception as e:
+            return HttpResponse(status=400)
+
+    return HttpResponse(status=405)

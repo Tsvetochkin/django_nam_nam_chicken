@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-y^yjuu(leig@l@3bv(3h!@r7*jh9o_b1n%jmyjv(#nfpq%jrkq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'dev.yokotoka.is']
+
+# CSRF settings for proxied domain
+CSRF_TRUSTED_ORIGINS = ['https://dev.yokotoka.is']
 
 
 # Application definition
@@ -150,3 +153,4 @@ DEFAULT_FROM_EMAIL = 'admin@namnamchicken.com'
 # MercadoPago settings (test mode)
 MERCADOPAGO_ACCESS_TOKEN = 'APP_USR-4684010387998759-112413-3c3480210be940419474796c4a29e12e-3010611190'
 MERCADOPAGO_PUBLIC_KEY = 'APP_USR-822c026a-a1ca-4a4e-b0a2-cce382221a05'
+MERCADOPAGO_WEBHOOK_SECRET = '87fbcb2eb66bc2d4b902056cde13faf3505b1f758dc53e9bf5adcdd70fefd8a7'
