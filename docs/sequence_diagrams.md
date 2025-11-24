@@ -5,6 +5,11 @@ Estos diagramas muestran la interacción entre objetos en diferentes flujos del 
 
 ## 1. Agregar Producto al Carrito
 
+![Add to Cart Sequence](./images/sequence_1_add_to_cart.png)
+
+<details>
+<summary>Ver código Mermaid</summary>
+
 ```mermaid
 sequenceDiagram
     actor User
@@ -30,7 +35,14 @@ sequenceDiagram
     ProductDetailView->>User: show success message
 ```
 
+</details>
+
 ## 2. Completar Compra (Checkout)
+
+![Checkout Sequence](./images/sequence_2_checkout.png)
+
+<details>
+<summary>Ver código Mermaid</summary>
 
 ```mermaid
 sequenceDiagram
@@ -76,7 +88,14 @@ sequenceDiagram
     OrderCreateView->>User: show success page
 ```
 
+</details>
+
 ## 3. Proceso de Login
+
+![Login Sequence](./images/sequence_3_login.png)
+
+<details>
+<summary>Ver código Mermaid</summary>
 
 ```mermaid
 sequenceDiagram
@@ -101,7 +120,14 @@ sequenceDiagram
     LoginView->>User: show success message
 ```
 
+</details>
+
 ## 4. Aplicar Cupón (BONUS)
+
+![Apply Coupon Sequence](./images/sequence_4_coupon.png)
+
+<details>
+<summary>Ver código Mermaid</summary>
 
 ```mermaid
 sequenceDiagram
@@ -135,7 +161,14 @@ sequenceDiagram
     CartView->>User: redirect to cart_detail
 ```
 
+</details>
+
 ## 5. Agregar a Lista de Deseos (BONUS)
+
+![Wishlist Sequence](./images/sequence_5_wishlist.png)
+
+<details>
+<summary>Ver código Mermaid</summary>
 
 ```mermaid
 sequenceDiagram
@@ -165,7 +198,14 @@ sequenceDiagram
     WishlistAddView->>User: redirect to previous page
 ```
 
+</details>
+
 ## 6. Publicar Reseña (BONUS)
+
+![Review Sequence](./images/sequence_6_review.png)
+
+<details>
+<summary>Ver código Mermaid</summary>
 
 ```mermaid
 sequenceDiagram
@@ -197,6 +237,8 @@ sequenceDiagram
     ProductDetailView->>User: show success message
     ProductDetailView->>User: redirect to product detail
 ```
+
+</details>
 
 ## Explicación de Elementos Clave
 

@@ -3,6 +3,13 @@
 ## Descripción
 Este diagrama muestra las transiciones de estado del ciclo de vida de una orden (Order) en el sistema.
 
+## Diagrama
+
+![State Machine Diagram](./images/state_machine.png)
+
+<details>
+<summary>Ver código Mermaid</summary>
+
 ```mermaid
 stateDiagram-v2
     [*] --> pending: Order Created
@@ -60,6 +67,8 @@ stateDiagram-v2
         delivery failure.
     end note
 ```
+
+</details>
 
 ## Estados del Order
 

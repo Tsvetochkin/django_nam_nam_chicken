@@ -3,6 +3,13 @@
 ## Descripción
 Este diagrama muestra la estructura de la base de datos con todas las tablas, sus campos, tipos de datos, claves primarias (PK), claves foráneas (FK) y relaciones.
 
+## Diagrama
+
+![ER Diagram](./images/er_diagram.png)
+
+<details>
+<summary>Ver código Mermaid</summary>
+
 ```mermaid
 erDiagram
     auth_user ||--o| users_profile : "has"
@@ -112,6 +119,8 @@ erDiagram
         int used_count "UNSIGNED INT, DEFAULT 0"
     }
 ```
+
+</details>
 
 ## Explicación de Tablas y Relaciones
 

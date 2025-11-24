@@ -8,6 +8,13 @@ Este diagrama muestra las interacciones entre los diferentes actores del sistema
 - **Registered User (Usuario Registrado)**: Usuario autenticado con acceso a funcionalidades adicionales
 - **Admin (Administrador)**: Usuario con privilegios administrativos
 
+## Diagrama
+
+![Use Case Diagram](./images/use_case_diagram.png)
+
+<details>
+<summary>Ver código Mermaid</summary>
+
 ```mermaid
 graph TB
     subgraph "Nam Nam Chicken System"
@@ -97,3 +104,6 @@ graph TB
     style Guest fill:#e1f5ff
     style RegUser fill:#ffe1e1
     style Admin fill:#fff4e1
+```
+
+</details>

@@ -8,24 +8,24 @@ Esta carpeta contiene todos los diagramas UML del proyecto Django Nam Nam Chicke
 ### 1. Diagrama de Casos de Uso (8% de la evaluación)
 **Archivo**: [use_case_diagram.md](./use_case_diagram.md)
 
-**Descripción**: Muestra las interacciones entre actores (Guest, Registered User, Admin) y los casos de uso del sistema.
+**Descripción**: Muestra las interacciones entre actores (Invitado, Usuario Registrado, Administrador) y los casos de uso del sistema.
 
 **Actores**:
-- Guest (Usuario Visitante)
-- Registered User (Usuario Registrado)
-- Admin (Administrador)
+- Invitado (Usuario Visitante)
+- Usuario Registrado
+- Administrador
 
 **Casos de Uso Principales**:
-- Register, Login/Logout
-- Browse Products, Search Products, Filter by Category
-- View Product Detail
-- Add to Cart, Modify Cart, Remove from Cart, Clear Cart
-- Apply Coupon (BONUS)
-- Checkout
-- View Purchase History (Registered User)
-- Manage Wishlist (BONUS - Registered User)
-- Post Review (BONUS - Registered User)
-- Manage Products, Manage Orders (Admin)
+- Registrarse, Iniciar/Cerrar Sesión
+- Navegar Productos, Buscar Productos, Filtrar por Categoría
+- Ver Detalle de Producto
+- Agregar al Carrito, Modificar Carrito, Eliminar del Carrito, Vaciar Carrito
+- Aplicar Cupón (BONUS)
+- Realizar Compra
+- Ver Historial de Compras (Usuario Registrado)
+- Gestionar Lista de Deseos (BONUS - Usuario Registrado)
+- Publicar Reseña (BONUS - Usuario Registrado)
+- Gestionar Productos, Gestionar Órdenes (Administrador)
 
 ---
 
@@ -35,7 +35,7 @@ Esta carpeta contiene todos los diagramas UML del proyecto Django Nam Nam Chicke
 **Descripción**: Estructura completa de clases del sistema con atributos, métodos y relaciones.
 
 **Clases Principales**:
-- **User** (Django Built-in)
+- **User** (Django incorporado)
 - **Profile** - Perfil extendido del usuario
 - **Category** - Categorías de productos
 - **Product** - Productos del menú
@@ -49,7 +49,7 @@ Esta carpeta contiene todos los diagramas UML del proyecto Django Nam Nam Chicke
 **Relaciones**:
 - 1:1 (User-Profile)
 - 1:N (Category-Product, User-Order, Order-OrderItem, etc.)
-- N:M (User-Product via WishlistItem)
+- N:M (User-Product vía WishlistItem)
 
 ---
 
@@ -59,16 +59,16 @@ Esta carpeta contiene todos los diagramas UML del proyecto Django Nam Nam Chicke
 **Descripción**: Seis diagramas que muestran la interacción entre objetos en diferentes flujos.
 
 **Diagramas Incluidos**:
-1. **Add Product to Cart** - Agregar producto al carrito
-2. **Complete Purchase (Checkout)** - Proceso completo de compra con MercadoPago
-3. **Login Process** - Autenticación de usuario
-4. **Apply Coupon** (BONUS) - Aplicación de cupones de descuento
-5. **Add to Wishlist** (BONUS) - Agregar a lista de deseos
-6. **Post Review** (BONUS) - Publicar reseña de producto
+1. **Agregar Producto al Carrito** - Agregar producto al carrito
+2. **Completar Compra (Checkout)** - Proceso completo de compra con MercadoPago
+3. **Proceso de Login** - Autenticación de usuario
+4. **Aplicar Cupón** (BONUS) - Aplicación de cupones de descuento
+5. **Agregar a Lista de Deseos** (BONUS) - Agregar a lista de deseos
+6. **Publicar Reseña** (BONUS) - Publicar reseña de producto
 
 **Participantes Principales**:
-- User, Views (ProductDetailView, OrderCreateView, etc.)
-- Models (Product, Order, OrderItem, Review, Coupon, WishlistItem)
+- Usuario, Vistas (ProductDetailView, OrderCreateView, etc.)
+- Modelos (Product, Order, OrderItem, Review, Coupon, WishlistItem)
 - Cart, Session, MercadoPagoSDK, EmailService
 
 ---
@@ -79,7 +79,7 @@ Esta carpeta contiene todos los diagramas UML del proyecto Django Nam Nam Chicke
 **Descripción**: Estructura completa de la base de datos con tablas, campos, tipos, claves y relaciones.
 
 **Tablas Principales**:
-- **auth_user** - Usuarios (Django built-in)
+- **auth_user** - Usuarios (Django incorporado)
 - **users_profile** - Perfil extendido
 - **users_wishlistitem** - Lista de deseos (BONUS)
 - **shop_category** - Categorías
@@ -90,11 +90,11 @@ Esta carpeta contiene todos los diagramas UML del proyecto Django Nam Nam Chicke
 - **shop_coupon** - Cupones (BONUS)
 
 **Características Destacadas**:
-- Primary Keys (PK), Foreign Keys (FK)
+- Claves Primarias (PK), Claves Foráneas (FK)
 - Índices para optimización
-- Unique Constraints
-- CHECK Constraints
-- CASCADE behaviors
+- Restricciones Unique
+- Restricciones CHECK
+- Comportamientos CASCADE
 - Cardinalidades detalladas
 
 ---
@@ -119,7 +119,7 @@ pending → paid → processing → shipped → delivered
 ```
 
 **Incluye**:
-- Triggers de cada transición
+- Disparadores de cada transición
 - Acciones en cada estado
 - Reglas de negocio
 - Casos de uso por estado
@@ -157,7 +157,7 @@ pending → paid → processing → shipped → delivered
 - ¿Pago exitoso?
 
 **Incluye**:
-- Swimlanes (responsabilidades)
+- Carriles de responsabilidad
 - Casos de error y recuperación
 - Tiempo estimado del flujo
 - Mejoras futuras
@@ -166,7 +166,7 @@ pending → paid → processing → shipped → delivered
 
 ## Características del Proyecto Implementadas
 
-### Funcionalidades Core
+### Funcionalidades Principales
 ✅ Catálogo de productos con categorías
 ✅ Búsqueda y filtrado de productos
 ✅ Carrito de compras con gestión de sesión
@@ -177,23 +177,23 @@ pending → paid → processing → shipped → delivered
 ✅ Panel de administración Django
 
 ### Funcionalidades BONUS Implementadas
-✅ **Reviews** - Sistema de reseñas con ratings (1-5 estrellas)
-✅ **Coupons** - Cupones de descuento con validación
-✅ **Wishlist** - Lista de deseos para usuarios registrados
-✅ **Email Notifications** - Confirmación de órdenes por email
-✅ **Purchase History** - Historial de compras
-✅ **Guest Checkout** - Compra sin registro
+✅ **Reseñas** - Sistema de reseñas con calificaciones (1-5 estrellas)
+✅ **Cupones** - Cupones de descuento con validación
+✅ **Lista de Deseos** - Lista de deseos para usuarios registrados
+✅ **Notificaciones por Email** - Confirmación de órdenes por email
+✅ **Historial de Compras** - Historial de compras
+✅ **Compra sin Registro** - Compra sin necesidad de registro
 
 ---
 
 ## Tecnologías Utilizadas
 
 - **Backend**: Django 5.1.4
-- **Database**: SQLite (desarrollo) / PostgreSQL (producción)
-- **Payment Gateway**: MercadoPago SDK
+- **Base de Datos**: SQLite (desarrollo) / PostgreSQL (producción)
+- **Pasarela de Pagos**: MercadoPago SDK
 - **Email**: Django email backend
 - **Frontend**: Django Templates, Bootstrap
-- **Diagrams**: Mermaid (Markdown-based)
+- **Diagramas**: Mermaid (basado en Markdown)
 
 ---
 
@@ -202,16 +202,30 @@ pending → paid → processing → shipped → delivered
 ### Opción 1: GitHub
 Los archivos .md con bloques ```mermaid se renderizarán automáticamente en GitHub.
 
-### Opción 2: VS Code
+### Opción 2: Imágenes PNG
+Todos los diagramas están disponibles como imágenes PNG en la carpeta `images/`:
+- `use_case_diagram.png`
+- `class_diagram.png`
+- `sequence_1_add_to_cart.png`
+- `sequence_2_checkout.png`
+- `sequence_3_login.png`
+- `sequence_4_coupon.png`
+- `sequence_5_wishlist.png`
+- `sequence_6_review.png`
+- `er_diagram.png`
+- `state_machine.png`
+- `activity_diagram.png`
+
+### Opción 3: VS Code
 Instalar extensión "Markdown Preview Mermaid Support":
 ```bash
 code --install-extension bierner.markdown-mermaid
 ```
 
-### Opción 3: Mermaid Live Editor
+### Opción 4: Mermaid Live Editor
 Copiar el código Mermaid a: https://mermaid.live/
 
-### Opción 4: Markdown Viewer
+### Opción 5: Visualizador Markdown
 Usar cualquier visualizador de Markdown con soporte Mermaid (GitLab, Notion, Obsidian, etc.)
 
 ---
@@ -221,6 +235,18 @@ Usar cualquier visualizador de Markdown con soporte Mermaid (GitLab, Notion, Obs
 ```
 django_nam_nam_chicken/
 ├── docs/                           # Esta carpeta
+│   ├── images/                     # Imágenes PNG de los diagramas
+│   │   ├── use_case_diagram.png
+│   │   ├── class_diagram.png
+│   │   ├── sequence_1_add_to_cart.png
+│   │   ├── sequence_2_checkout.png
+│   │   ├── sequence_3_login.png
+│   │   ├── sequence_4_coupon.png
+│   │   ├── sequence_5_wishlist.png
+│   │   ├── sequence_6_review.png
+│   │   ├── er_diagram.png
+│   │   ├── state_machine.png
+│   │   └── activity_diagram.png
 │   ├── README.md                   # Este archivo
 │   ├── use_case_diagram.md         # Diagrama de Casos de Uso
 │   ├── class_diagram.md            # Diagrama de Clases
@@ -230,16 +256,16 @@ django_nam_nam_chicken/
 │   └── activity_diagram.md         # Diagrama de Actividades
 ├── shop/                           # App principal
 │   ├── models.py                   # Category, Product, Review, Order, OrderItem, Coupon
-│   ├── views.py                    # Views del shop
+│   ├── views.py                    # Vistas del shop
 │   ├── urls.py                     # URLs del shop
 │   └── ...
 ├── users/                          # App de usuarios
 │   ├── models.py                   # Profile, WishlistItem
-│   ├── views.py                    # Views de usuarios
+│   ├── views.py                    # Vistas de usuarios
 │   └── ...
 ├── cart/                           # App del carrito
 │   ├── cart.py                     # Clase Cart
-│   ├── views.py                    # Views del carrito
+│   ├── views.py                    # Vistas del carrito
 │   └── ...
 └── manage.py
 ```
@@ -254,8 +280,8 @@ django_nam_nam_chicken/
 - **Diagramas de Secuencia**: 10% (mínimo 3 diagramas - tenemos 6)
 - **Diagrama Entidad-Relación**: 7%
 - **Diagramas BONUS**: Puntos adicionales
-  - State Machine Diagram
-  - Activity Diagram
+  - Diagrama de Máquina de Estados
+  - Diagrama de Actividades
 
 **Total Base**: 35%
 **Total con BONUS**: 35% + puntos extra
@@ -265,10 +291,11 @@ django_nam_nam_chicken/
 ## Notas Importantes
 
 1. **Precisión**: Todos los diagramas reflejan el código real implementado en el proyecto
-2. **Completitud**: Incluyen todas las funcionalidades core + todas las bonus
+2. **Completitud**: Incluyen todas las funcionalidades principales + todas las bonus
 3. **Formato**: Mermaid Markdown para fácil versionado y renderizado
 4. **Documentación**: Cada diagrama incluye explicaciones detalladas
-5. **Relaciones**: Todos los diagramas están interconectados y consistentes
+5. **Relaciones**: Todos los diagramas están interconectados y son consistentes
+6. **Imágenes PNG**: Disponibles para visualización sin dependencias
 
 ---
 

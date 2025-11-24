@@ -3,6 +3,13 @@
 ## Descripción
 Este diagrama muestra el flujo completo del proceso de checkout (compra) en el sistema, desde que el usuario visualiza su carrito hasta que recibe la confirmación de la orden.
 
+## Diagrama
+
+![Activity Diagram](./images/activity_diagram.png)
+
+<details>
+<summary>Ver código Mermaid</summary>
+
 ```mermaid
 flowchart TD
     Start([Usuario Inicia Checkout]) --> ViewCart[Ver Carrito]
@@ -117,6 +124,8 @@ flowchart TD
     style CheckStock fill:#fff4e1
     style CheckItemStock fill:#fff4e1
 ```
+
+</details>
 
 ## Descripción del Flujo
 

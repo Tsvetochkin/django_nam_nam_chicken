@@ -3,6 +3,13 @@
 ## Descripción
 Este diagrama muestra la estructura de clases del sistema, incluyendo todos los modelos Django, sus atributos, métodos y relaciones.
 
+## Diagrama
+
+![Class Diagram](./images/class_diagram.png)
+
+<details>
+<summary>Ver código Mermaid</summary>
+
 ```mermaid
 classDiagram
     class User {
@@ -144,3 +151,6 @@ classDiagram
 
     Cart ..> Product : manages
     Cart ..> Coupon : applies
+```
+
+</details>
