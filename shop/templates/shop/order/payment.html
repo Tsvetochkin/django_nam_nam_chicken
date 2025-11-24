@@ -6,8 +6,10 @@
 <h1>Completar Pago</h1>
 <p>Pedido #{{ order.id }} - Total: ${{ order.get_total_cost|floatformat:2 }}</p>
 
+{% if sandbox_init_point %}
+<a href="{{ sandbox_init_point }}" class="btn btn-primary btn-lg">Pagar con MercadoPago (Sandbox)</a>
+{% elif preference_id %}
 <div id="mercadopago-button"></div>
-
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 <script>
 const mp = new MercadoPago('{{ public_key }}');
@@ -17,4 +19,7 @@ mp.bricks().create("wallet", "mercadopago-button", {
   },
 });
 </script>
+{% else %}
+<p class="text-danger">Error al crear preferencia de pago.</p>
+{% endif %}
 {% endblock %}

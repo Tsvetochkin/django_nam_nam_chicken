@@ -117,24 +117,39 @@ def order_create(request):
                     "unit_price": float(item.price),
                 })
 
+            base_url = "https://dev.yokotoka.is"
             preference_data = {
                 "items": items,
                 "back_urls": {
-                    "success": request.build_absolute_uri(f'/shop/payment-success/{order.id}/'),
-                    "failure": request.build_absolute_uri(f'/shop/payment-failure/{order.id}/'),
-                    "pending": request.build_absolute_uri(f'/shop/payment-pending/{order.id}/')
+                    "success": f"{base_url}/payment-success/{order.id}/",
+                    "failure": f"{base_url}/payment-failure/{order.id}/",
+                    "pending": f"{base_url}/payment-pending/{order.id}/"
                 },
                 "auto_return": "approved",
-                "notification_url": request.build_absolute_uri('/shop/webhook/'),
+                "notification_url": f"{base_url}/webhook/",
                 "external_reference": str(order.id),
             }
 
             preference_response = sdk.preference().create(preference_data)
-            preference = preference_response.get("response", preference_response)
+
+            # Log the response for debugging
+            print(f"MercadoPago Response: {preference_response}")
+            print(f"Response status: {preference_response.get('status')}")
+            print(f"Response body: {preference_response.get('response')}")
+
+            if preference_response.get('status') == 201:
+                preference = preference_response.get("response", {})
+                preference_id = preference.get('id')
+                sandbox_init_point = preference.get('sandbox_init_point')
+            else:
+                print(f"MercadoPago API Error: {preference_response}")
+                preference_id = None
+                sandbox_init_point = None
 
             return render(request, 'shop/order/payment.html', {
                 'order': order,
-                'preference_id': preference.get('id', preference_response.get('id')),
+                'preference_id': preference_id,
+                'sandbox_init_point': sandbox_init_point,
                 'public_key': settings.MERCADOPAGO_PUBLIC_KEY
             })
     else:
@@ -198,19 +213,43 @@ def payment_pending(request, order_id):
 def mercadopago_webhook(request):
     if request.method == 'POST':
         try:
-            # Verify webhook signature
-            x_signature = request.headers.get('x-signature')
-            x_request_id = request.headers.get('x-request-id')
+            sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
-            # Get the raw body
-            data = json.loads(request.body.decode('utf-8'))
+            # Check query params first (IPN style)
+            topic = request.GET.get('topic')
+            resource_id = request.GET.get('id')
 
-            # Process payment notification
+            if topic == 'merchant_order' and resource_id:
+                # Get merchant order details
+                merchant_order = sdk.merchant_order().get(resource_id)
+                if merchant_order['status'] == 200:
+                    order_data = merchant_order['response']
+                    external_reference = order_data.get('external_reference')
+
+                    # Check if all payments are approved
+                    payments = order_data.get('payments', [])
+                    paid_amount = sum(p['transaction_amount'] for p in payments if p['status'] == 'approved')
+
+                    if paid_amount >= order_data.get('total_amount', 0) and external_reference:
+                        try:
+                            order = Order.objects.get(id=external_reference)
+                            if not order.paid:
+                                order.paid = True
+                                order.status = Order.STATUS_PAID
+                                order.save()
+                                for item in order.items.all():
+                                    product = item.product
+                                    product.stock -= item.quantity
+                                    product.save()
+                        except Order.DoesNotExist:
+                            pass
+                return HttpResponse(status=200)
+
+            # Check body for webhook v2 style
+            data = json.loads(request.body.decode('utf-8')) if request.body else {}
+
             if data.get('type') == 'payment':
                 payment_id = data.get('data', {}).get('id')
-
-                # Get payment details from MercadoPago
-                sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
                 payment_info = sdk.payment().get(payment_id)
 
                 if payment_info['status'] == 200:
@@ -220,13 +259,10 @@ def mercadopago_webhook(request):
                     if external_reference:
                         try:
                             order = Order.objects.get(id=external_reference)
-
-                            if payment['status'] == 'approved':
+                            if payment['status'] == 'approved' and not order.paid:
                                 order.paid = True
                                 order.status = Order.STATUS_PAID
                                 order.save()
-
-                                # Reduce stock
                                 for item in order.items.all():
                                     product = item.product
                                     product.stock -= item.quantity
@@ -236,36 +272,36 @@ def mercadopago_webhook(request):
 
             return HttpResponse(status=200)
         except Exception as e:
-            return HttpResponse(status=400)
+            print(f"Webhook error: {e}")
+            return HttpResponse(status=200)  # Always return 200 to avoid retries
 
     return HttpResponse(status=405)
 
 
 @csrf_exempt
 def mercadopago_ipn(request):
-    if request.method == 'POST' or request.method == 'GET':
+    if request.method in ('POST', 'GET'):
+        topic = request.GET.get('topic') or request.POST.get('topic')
+        resource_id = request.GET.get('id') or request.POST.get('id')
+
+        if not topic or not resource_id:
+            return HttpResponse(status=200)
+
         try:
-            topic = request.GET.get('topic') or request.POST.get('topic')
-            payment_id = request.GET.get('id') or request.POST.get('id')
+            sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
-            if topic == 'payment' and payment_id:
-                sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
-                payment_info = sdk.payment().get(payment_id)
-
-                if payment_info['status'] == 200:
+            if topic == 'payment':
+                payment_info = sdk.payment().get(resource_id)
+                if payment_info.get('status') == 200:
                     payment = payment_info['response']
                     external_reference = payment.get('external_reference')
-
-                    if external_reference:
+                    if external_reference and payment.get('status') == 'approved':
                         try:
                             order = Order.objects.get(id=external_reference)
-
-                            if payment['status'] == 'approved':
+                            if not order.paid:
                                 order.paid = True
                                 order.status = Order.STATUS_PAID
                                 order.save()
-
-                                # Reduce stock
                                 for item in order.items.all():
                                     product = item.product
                                     product.stock -= item.quantity
@@ -273,8 +309,30 @@ def mercadopago_ipn(request):
                         except Order.DoesNotExist:
                             pass
 
-            return HttpResponse(status=200)
-        except Exception as e:
-            return HttpResponse(status=400)
+            elif topic == 'merchant_order':
+                merchant_order = sdk.merchant_order().get(resource_id)
+                if merchant_order.get('status') == 200:
+                    order_data = merchant_order['response']
+                    external_reference = order_data.get('external_reference')
+                    payments = order_data.get('payments', [])
+                    paid_amount = sum(p['transaction_amount'] for p in payments if p['status'] == 'approved')
+                    if paid_amount >= order_data.get('total_amount', 0) and external_reference:
+                        try:
+                            order = Order.objects.get(id=external_reference)
+                            if not order.paid:
+                                order.paid = True
+                                order.status = Order.STATUS_PAID
+                                order.save()
+                                for item in order.items.all():
+                                    product = item.product
+                                    product.stock -= item.quantity
+                                    product.save()
+                        except Order.DoesNotExist:
+                            pass
 
-    return HttpResponse(status=405)
+        except Exception as e:
+            print(f"IPN error: {e}")
+
+        return HttpResponse(status=200)
+
+    return HttpResponse(status=200)
