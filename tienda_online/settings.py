@@ -146,3 +146,7 @@ LOGIN_URL = 'users:login'
 # Email settings for console output
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'admin@namnamchicken.com'
+
+# MercadoPago settings (test mode)
+MERCADOPAGO_ACCESS_TOKEN = 'APP_USR-4684010387998759-112413-3c3480210be940419474796c4a29e12e-3010611190'
+MERCADOPAGO_PUBLIC_KEY = 'APP_USR-822c026a-a1ca-4a4e-b0a2-cce382221a05'

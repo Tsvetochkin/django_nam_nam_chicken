@@ -69,6 +69,22 @@ class Review(models.Model):
 
 
 class Order(models.Model):
+    STATUS_PENDING = 'pending'
+    STATUS_PAID = 'paid'
+    STATUS_PROCESSING = 'processing'
+    STATUS_SHIPPED = 'shipped'
+    STATUS_DELIVERED = 'delivered'
+    STATUS_CANCELLED = 'cancelled'
+
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_PAID, 'Paid'),
+        (STATUS_PROCESSING, 'Processing'),
+        (STATUS_SHIPPED, 'Shipped'),
+        (STATUS_DELIVERED, 'Delivered'),
+        (STATUS_CANCELLED, 'Cancelled'),
+    ]
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.SET_NULL,
                              null=True, blank=True,
@@ -77,11 +93,12 @@ class Order(models.Model):
     last_name = models.CharField(max_length=50)
     email = models.EmailField()
     address = models.CharField(max_length=250)
-    celular = models.CharField(max_length=20, blank=True) # New field
-    notes = models.TextField(blank=True) # New field for order notes
+    celular = models.CharField(max_length=20, blank=True)
+    notes = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     paid = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
 
     class Meta:
         ordering = ['-created']
@@ -111,3 +128,26 @@ class OrderItem(models.Model):
 
     def get_cost(self):
         return self.price * self.quantity
+
+
+class Coupon(models.Model):
+    code = models.CharField(max_length=50, unique=True)
+    discount_percent = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+    active = models.BooleanField(default=True)
+    usage_limit = models.PositiveIntegerField(default=1)
+    used_count = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['-valid_from']
+
+    def __str__(self):
+        return f'{self.code} ({self.discount_percent}% off)'
+
+    def is_valid(self):
+        from django.utils import timezone
+        now = timezone.now()
+        return (self.active and
+                self.valid_from <= now <= self.valid_to and
+                self.used_count < self.usage_limit)

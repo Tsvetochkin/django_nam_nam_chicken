@@ -15,7 +15,23 @@
         </div>
         <div class="card-body">
           <h5 class="card-title">Total: ${{ order.get_total_cost|floatformat:2 }}</h5>
-          <p class="card-text">Estado: {% if order.paid %}Pagado{% else %}No pagado{% endif %}</p>
+          <p class="card-text">
+            Payment: {% if order.paid %}<span class="badge bg-success">Pagado</span>{% else %}<span class="badge bg-warning">No pagado</span>{% endif %}
+            | Status:
+            {% if order.status == 'pending' %}
+              <span class="badge bg-secondary">Pending</span>
+            {% elif order.status == 'paid' %}
+              <span class="badge bg-info">Paid</span>
+            {% elif order.status == 'processing' %}
+              <span class="badge bg-primary">Processing</span>
+            {% elif order.status == 'shipped' %}
+              <span class="badge bg-warning">Shipped</span>
+            {% elif order.status == 'delivered' %}
+              <span class="badge bg-success">Delivered</span>
+            {% elif order.status == 'cancelled' %}
+              <span class="badge bg-danger">Cancelled</span>
+            {% endif %}
+          </p>
           {% if order.notes %}
             <p class="card-text">Notas: {{ order.notes }}</p>
           {% endif %}

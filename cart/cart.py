@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.conf import settings
-from shop.models import Product
+from shop.models import Product, Coupon
 
 
 class Cart:
@@ -14,6 +14,7 @@ class Cart:
             # save an empty cart in the session
             cart = self.session[settings.CART_SESSION_ID] = {}
         self.cart = cart
+        self.coupon_id = self.session.get('coupon_id')
 
     def add(self, product, quantity=1, update_quantity=False):
         """
@@ -63,17 +64,14 @@ class Cart:
         product_map = {str(p.id): p for p in products}
 
         cart_copy = self.cart.copy()
-        for product_id, item in list(cart_copy.items()): # Iterate over a copy to allow modification
-            print(f"DEBUG: Processing item - product_id: {product_id}, item: {item}")
+        for product_id, item in list(cart_copy.items()):
             if product_id in product_map:
                 item['product'] = product_map[product_id]
                 item['price'] = Decimal(item['price'])
                 item['total_price'] = item['price'] * item['quantity']
-                print(f"DEBUG: Yielding item with product: {item['product'].name}")
                 yield item
             else:
                 # Product no longer exists in the database, remove it from cart
-                print(f"DEBUG: Product {product_id} not found in DB. Removing from cart.")
                 del self.cart[product_id]
                 self.save()
 
@@ -90,5 +88,31 @@ class Cart:
     def clear(self):
         # remove cart from session
         del self.session[settings.CART_SESSION_ID]
-        self.cart = {} # Reset the cart attribute
+        self.cart = {}
+        self.clear_coupon()
         self.save()
+
+    def apply_coupon(self, coupon):
+        self.session['coupon_id'] = coupon.id
+        self.coupon_id = coupon.id
+        self.session.modified = True
+
+    def clear_coupon(self):
+        if 'coupon_id' in self.session:
+            del self.session['coupon_id']
+        self.coupon_id = None
+        self.session.modified = True
+
+    @property
+    def coupon(self):
+        if self.coupon_id:
+            return Coupon.objects.filter(id=self.coupon_id).first()
+        return None
+
+    def get_discount(self):
+        if self.coupon:
+            return self.get_total_price() * (Decimal(self.coupon.discount_percent) / Decimal(100))
+        return Decimal(0)
+
+    def get_total_price_after_discount(self):
+        return self.get_total_price() - self.get_discount()

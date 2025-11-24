@@ -48,10 +48,53 @@
           </tr>
         {% endwith %}
       {% endfor %}
+      <tr>
+        <td colspan="6">
+          {% if cart.coupon %}
+            <div class="alert alert-success d-flex justify-content-between align-items-center">
+              <span>
+                <strong>Cupón aplicado:</strong> {{ cart.coupon.code }} ({{ cart.coupon.discount_percent }}% de descuento)
+              </span>
+              <form action="{% url 'cart:remove_coupon' %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger">Remover cupón</button>
+              </form>
+            </div>
+          {% else %}
+            <form action="{% url 'cart:apply_coupon' %}" method="post" class="row g-3">
+              {% csrf_token %}
+              <div class="col-auto">
+                <label for="coupon_code" class="col-form-label">Código de cupón:</label>
+              </div>
+              <div class="col-auto">
+                <input type="text" name="coupon_code" id="coupon_code" class="form-control" placeholder="Ingresa tu cupón" required>
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Aplicar cupón</button>
+              </div>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td colspan="5" class="text-end fw-bold">Subtotal</td>
+        <td class="text-end fw-bold">${{ cart.get_total_price }}</td>
+      </tr>
+      {% if cart.coupon %}
+      <tr class="table-success">
+        <td colspan="5" class="text-end text-success">Descuento ({{ cart.coupon.discount_percent }}%)</td>
+        <td class="text-end text-success">-${{ cart.get_discount }}</td>
+      </tr>
+      <tr class="table-info">
+        <td colspan="5" class="text-end fw-bold">Total</td>
+        <td class="text-end fw-bold">${{ cart.get_total_price_after_discount }}</td>
+      </tr>
+      {% else %}
       <tr class="table-info">
         <td colspan="5" class="text-end fw-bold">Total</td>
         <td class="text-end fw-bold">${{ cart.get_total_price }}</td>
       </tr>
+      {% endif %}
     </tbody>
   </table>
   <p class="text-end">

@@ -5,9 +5,10 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
 from django.contrib import messages
+import mercadopago
 
-from .models import Category, Product, Order, OrderItem, Review # Import Review model
-from .forms import OrderCreateForm, ReviewForm # Import ReviewForm
+from .models import Category, Product, Order, OrderItem, Review
+from .forms import OrderCreateForm, ReviewForm
 from cart.cart import Cart
 from cart.forms import CartAddProductForm
 
@@ -41,10 +42,10 @@ def product_detail(request, id, slug):
     
     reviews = product.reviews.all()
     
-    if request.method == 'POST':
+    if request.method == 'POST' and request.user.is_authenticated:
         # Check if user already reviewed this product
         existing_review = Review.objects.filter(product=product, user=request.user).first()
-        
+
         if existing_review:
             review_form = ReviewForm(request.POST, instance=existing_review)
         else:
@@ -61,9 +62,12 @@ def product_detail(request, id, slug):
             messages.error(request, 'Hubo un error al enviar tu reseña. Por favor, verifica los datos.')
     else:
         # If user already reviewed, pre-fill the form with their review
-        existing_review = Review.objects.filter(product=product, user=request.user).first()
-        if existing_review:
-            review_form = ReviewForm(instance=existing_review)
+        if request.user.is_authenticated:
+            existing_review = Review.objects.filter(product=product, user=request.user).first()
+            if existing_review:
+                review_form = ReviewForm(instance=existing_review)
+            else:
+                review_form = ReviewForm()
         else:
             review_form = ReviewForm()
 
@@ -78,7 +82,7 @@ def product_detail(request, id, slug):
 def order_create(request):
     cart = Cart(request)
     if not cart:
-        return redirect('shop:product_list') # Redirect if cart is empty
+        return redirect('shop:product_list')
 
     if request.method == 'POST':
         form = OrderCreateForm(request.POST)
@@ -86,29 +90,46 @@ def order_create(request):
             order = form.save(commit=False)
             if request.user.is_authenticated:
                 order.user = request.user
-            order.paid = True # Simulate payment
             order.save()
 
             for item in cart:
+                product = item['product']
+                quantity = item['quantity']
+
                 OrderItem.objects.create(order=order,
-                                         product=item['product'],
+                                         product=product,
                                          price=item['price'],
-                                         quantity=item['quantity'])
-            cart.clear()
-            messages.success(request, f'Order {order.id} has been successfully placed!') # Add success message
+                                         quantity=quantity)
 
-            # Simulate sending email
-            subject = f'Order nr. {order.id} from Nam Nam Chicken'
-            html_message = render_to_string('shop/order/order_confirmation_email.html', {'order': order})
-            plain_message = strip_tags(html_message)
-            from_email = settings.DEFAULT_FROM_EMAIL
-            to_email = order.email
+            # Create MercadoPago preference
+            sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
-            send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
+            items = []
+            for item in order.items.all():
+                items.append({
+                    "title": item.product.name,
+                    "quantity": item.quantity,
+                    "unit_price": float(item.price),
+                })
 
-            return render(request,
-                          'shop/order/created.html',
-                          {'order': order})
+            preference_data = {
+                "items": items,
+                "back_urls": {
+                    "success": request.build_absolute_uri(f'/shop/payment-success/{order.id}/'),
+                    "failure": request.build_absolute_uri(f'/shop/payment-failure/{order.id}/'),
+                    "pending": request.build_absolute_uri(f'/shop/payment-pending/{order.id}/')
+                },
+                "auto_return": "approved",
+            }
+
+            preference_response = sdk.preference().create(preference_data)
+            preference = preference_response["response"]
+
+            return render(request, 'shop/order/payment.html', {
+                'order': order,
+                'preference_id': preference['id'],
+                'public_key': settings.MERCADOPAGO_PUBLIC_KEY
+            })
     else:
         # Pre-fill form for authenticated users
         if request.user.is_authenticated:
@@ -125,3 +146,42 @@ def order_create(request):
     return render(request,
                   'shop/order/create.html',
                   {'cart': cart, 'form': form})
+
+
+def payment_success(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    order.paid = True
+    order.status = Order.STATUS_PAID
+    order.save()
+
+    # Reduce stock
+    for item in order.items.all():
+        product = item.product
+        if product.stock >= item.quantity:
+            product.stock -= item.quantity
+            product.save()
+
+    # Clear cart
+    cart = Cart(request)
+    cart.clear()
+
+    # Send email
+    subject = f'Order nr. {order.id} from Nam Nam Chicken'
+    html_message = render_to_string('shop/order/order_confirmation_email.html', {'order': order})
+    plain_message = strip_tags(html_message)
+    send_mail(subject, plain_message, settings.DEFAULT_FROM_EMAIL, [order.email], html_message=html_message)
+
+    messages.success(request, f'Payment successful! Order {order.id} confirmed.')
+    return render(request, 'shop/order/created.html', {'order': order})
+
+
+def payment_failure(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    messages.error(request, 'Payment failed. Please try again.')
+    return render(request, 'shop/payment/failure.html', {'order': order})
+
+
+def payment_pending(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    messages.info(request, 'Payment is pending. We will notify you when it is confirmed.')
+    return render(request, 'shop/payment/pending.html', {'order': order})

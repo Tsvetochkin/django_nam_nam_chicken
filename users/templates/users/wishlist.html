@@ -1,0 +1,53 @@
+{% extends "shop/base.html" %}
+{% load static %}
+
+{% block title %}
+  Mi Lista de Deseos
+{% endblock %}
+
+{% block content %}
+  <h1>Mi Lista de Deseos</h1>
+
+  {% if wishlist_items %}
+    <div class="row">
+      {% for item in wishlist_items %}
+        <div class="col-md-4 mb-4">
+          <div class="card h-100">
+            <a href="{{ item.product.get_absolute_url }}">
+              {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" class="card-img-top" alt="{{ item.product.name }}">
+              {% else %}
+                <img src="https://via.placeholder.com/300x300.png?text=No+Image" class="card-img-top" alt="No image">
+              {% endif %}
+            </a>
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">
+                <a href="{{ item.product.get_absolute_url }}" class="text-decoration-none text-dark">
+                  {{ item.product.name }}
+                </a>
+              </h5>
+              <p class="card-text">{{ item.product.description|truncatewords:15 }}</p>
+              <div class="mt-auto">
+                <p class="fw-bold text-success">${{ item.product.price }}</p>
+                <div class="d-flex justify-content-between">
+                  <form action="{% url 'cart:cart_add' item.product.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" value="1">
+                    <input type="hidden" name="update" value="False">
+                    <button type="submit" class="btn btn-primary btn-sm">Add to Cart</button>
+                  </form>
+                  <a href="{% url 'users:wishlist_remove' item.id %}" class="btn btn-danger btn-sm">Remove</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      <p>Tu lista de deseos está vacía.</p>
+      <a href="{% url 'shop:product_list' %}" class="btn btn-primary">Explorar Productos</a>
+    </div>
+  {% endif %}
+{% endblock %}

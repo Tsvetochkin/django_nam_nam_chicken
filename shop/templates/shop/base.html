@@ -33,7 +33,14 @@
                     <input class="form-control me-2" type="search" aria-label="Buscar" name="q">
                     <button class="btn btn-outline-success" type="submit">Buscar</button>
                 </form>
-                <div class="ms-3">
+                {% if user.is_authenticated %}
+                <div class="ms-2">
+                    <a href="{% url 'users:wishlist' %}" class="btn btn-outline-danger" title="Mi Lista de Deseos">
+                        ♥ Lista
+                    </a>
+                </div>
+                {% endif %}
+                <div class="ms-2">
                     <a href="{% url 'cart:cart_detail' %}" class="btn btn-outline-primary">
                         Carrito
                         <span class="badge bg-primary">
@@ -51,6 +58,7 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href="{% url 'users:profile' %}">Mi Perfil</a></li>
                                 <li><a class="dropdown-item" href="{% url 'users:purchase_history' %}">Mis Pedidos</a></li>
+                                <li><a class="dropdown-item" href="{% url 'users:wishlist' %}">Mi Lista de Deseos</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'users:logout' %}">Cerrar Sesión</a></li>
                             </ul>
