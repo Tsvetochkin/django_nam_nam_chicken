@@ -123,11 +123,11 @@ def order_create(request):
             }
 
             preference_response = sdk.preference().create(preference_data)
-            preference = preference_response["response"]
+            preference = preference_response.get("response", preference_response)
 
             return render(request, 'shop/order/payment.html', {
                 'order': order,
-                'preference_id': preference['id'],
+                'preference_id': preference.get('id', preference_response.get('id')),
                 'public_key': settings.MERCADOPAGO_PUBLIC_KEY
             })
     else:

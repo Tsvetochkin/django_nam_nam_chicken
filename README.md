@@ -152,9 +152,57 @@ uv run python manage.py runserver
 
 Abrir navegador en `http://127.0.0.1:8000/`
 
+## 👤 Usuarios de Prueba
+
+El sistema incluye usuarios pre-configurados para facilitar las pruebas:
+
+| Usuario | Contraseña | Rol | Uso |
+|---------|-----------|-----|-----|
+| `admin` | `admin123` | Administrador | Acceso completo al panel de administración |
+| `testuser` | `test123` | Usuario regular | Pruebas de funcionalidad de cliente |
+| `apro` | `apro123` | Usuario regular | Pruebas de MercadoPago (usar con tarjeta APRO) |
+
 ### Acceso al Admin
 
-`http://127.0.0.1:8000/admin/` - Usar credenciales del superusuario
+- **URL:** `http://127.0.0.1:8000/admin/`
+- **Usuario:** `admin`
+- **Contraseña:** `admin123`
+
+## 💳 Pruebas de MercadoPago
+
+El sistema está configurado en **modo test** con credenciales de sandbox. Para probar pagos:
+
+### Tarjetas de Prueba
+
+| Tipo | Número | CVV | Vencimiento |
+|------|--------|-----|-------------|
+| Visa | `4509 9535 6623 3704` | `123` | `11/30` |
+| Mastercard | `5031 7557 3453 0604` | `123` | `11/30` |
+
+### Datos del Titular (para aprobación)
+
+Para que el pago sea **aprobado**, usar:
+- **Nombre:** `APRO`
+- **Documento:** `12345678`
+
+### Otros Escenarios de Prueba
+
+| Nombre | Resultado |
+|--------|-----------|
+| `APRO` | Pago aprobado ✅ |
+| `OTHE` | Rechazado por error general |
+| `CONT` | Pago pendiente |
+| `CALL` | Rechazado - requiere autorización |
+
+## 🎟️ Cupones de Descuento
+
+Cupones activos para pruebas:
+
+| Código | Descuento | Validez |
+|--------|-----------|---------|
+| `WELCOME10` | 10% | 365 días |
+| `VERANO20` | 20% | 90 días |
+| `PROMO15` | 15% | 30 días |
 
 ## 🧪 Testing
 
