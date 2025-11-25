@@ -10,4 +10,7 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('profile/', views.profile, name='profile'),
     path('purchase_history/', views.purchase_history, name='purchase_history'),
+    path('wishlist/', views.wishlist, name='wishlist'),
+    path('wishlist/add/<int:product_id>/', views.wishlist_add, name='wishlist_add'),
+    path('wishlist/remove/<int:item_id>/', views.wishlist_remove, name='wishlist_remove'),
 ]

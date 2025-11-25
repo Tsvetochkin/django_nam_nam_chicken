@@ -1,0 +1,12 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Pago Fallido{% endblock %}
+
+{% block content %}
+<div class="alert alert-danger">
+  <h1>Pago Fallido</h1>
+  <p>Lo sentimos, el pago para el pedido #{{ order.id }} no pudo ser procesado.</p>
+  <a href="{% url 'shop:order_create' %}" class="btn btn-primary">Intentar Nuevamente</a>
+  <a href="{% url 'shop:product_list' %}" class="btn btn-secondary">Volver a la Tienda</a>
+</div>
+{% endblock %}
